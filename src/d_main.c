@@ -1223,6 +1223,9 @@ static void IdentifyVersion(void)
 	// Add the characters
 	D_AddFile(&startupwadfiles, va(pandf,srb2waddir, "characters.pk3"));
 
+	 //Add the silly chat sounds
+    D_AddFile(&startupwadfiles, va(pandf,srb2waddir, "extrasounds.pk3"));
+
 #ifdef USE_PATCH_DTA
 	// Add our crappy patches to fix our bugs
 	D_AddFile(&startupwadfiles, va(pandf,srb2waddir, "patch.pk3"));
@@ -1489,12 +1492,13 @@ void D_SRB2Main(void)
 
 #ifndef DEVELOP // md5s last updated 22/02/20 (ddmmyy)
 
-	// Check MD5s of autoloaded files
-	W_VerifyFileMD5(0, ASSET_HASH_SRB2_PK3); // srb2.pk3
-	W_VerifyFileMD5(1, ASSET_HASH_ZONES_PK3); // zones.pk3
-	W_VerifyFileMD5(2, ASSET_HASH_CHARACTERS_PK3); // characters.pk3
+ // Check MD5s of autoloaded files
+    W_VerifyFileMD5(0, ASSET_HASH_SRB2_PK3); // srb2.pk3
+    W_VerifyFileMD5(1, ASSET_HASH_ZONES_PK3); // zones.pk3
+    W_VerifyFileMD5(2, ASSET_HASH_CHARACTERS_PK3); // characters.pk3
+    W_VerifyFileMD5(3, ASSET_HASH_EXTRA_PK3); // extrasounds.pk3
 #ifdef USE_PATCH_DTA
-	W_VerifyFileMD5(3, ASSET_HASH_PATCH_PK3); // patch.pk3
+    W_VerifyFileMD5(4, ASSET_HASH_PATCH_PK3); // patch.pk3
 #endif
 	// don't check music.pk3 because people like to modify it, and it doesn't matter if they do
 	// ...except it does if they slip maps in there, and that's what W_VerifyNMUSlumps is for.
