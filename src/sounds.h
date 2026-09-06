@@ -871,6 +871,15 @@ typedef enum
 	sfx_kc6d,
 	sfx_kc6e,
 
+	// Chat sounds
+    sfx_pban,
+    sfx_pjoin,
+    sfx_pkick,
+    sfx_pleave,
+    sfx_prjoin,
+    sfx_psfail,
+    sfx_pnjoin,
+
 	// free slots for S_AddSoundFx() at run-time --------------------
 	sfx_freeslot0,
 	//
