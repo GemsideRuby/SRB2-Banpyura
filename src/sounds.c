@@ -822,6 +822,13 @@ sfxinfo_t S_sfx[NUMSFX] =
   {"kc6c",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, ""},
   {"kc6d",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, ""},
   {"kc6e",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, ""},
+  {"pban",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, "Player Banned"},
+  {"pjoin",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, "Player Joins"},
+  {"pkick",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, "Player Kicked"},
+  {"pleave",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, "Player Left..."},
+  {"prjoin",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, "Player Re-Joins"},
+  {"psfail",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, "Connection Error"},
+  {"pnjoin",   false,  64, 0,                  -1, NULL, 0, -1, -1, LUMPERROR, "Disconnection..."},
 
   // skin sounds free slots to add sounds at run time (Boris HACK!!!)
   // initialized to NULL
