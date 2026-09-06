@@ -302,11 +302,17 @@ static void Got_AddPlayer(UINT8 **p, INT32 playernum)
 	{
 		char joinmsg[256];
 
-		if (rejoined)
-			strcpy(joinmsg, M_GetText("\x82*%s has rejoined the game (player %d)"));
-		else
-			strcpy(joinmsg, M_GetText("\x82*%s has joined the game (player %d)"));
-		strcpy(joinmsg, va(joinmsg, player_names[newplayernum], newplayernum));
+        if (rejoined)
+        {
+            S_StartSound(NULL, sfx_prjoin);
+            strcpy(joinmsg, M_GetText("\x82*%s has rejoined the game (player %d)"));
+        }
+        else
+        {
+            strcpy(joinmsg, M_GetText("\x82*%s has joined the game (player %d)"));
+            S_StartSound(NULL, sfx_pjoin);
+        }
+        strcpy(joinmsg, va(joinmsg, player_names[newplayernum], newplayernum));
 
 		// Merge join notification + IP to avoid clogging console/chat
 		if (server && cv_showjoinaddress.value && I_GetNodeAddress)
@@ -434,79 +440,88 @@ static void Got_KickCmd(UINT8 **p, INT32 playernum)
 
 	//CONS_Printf("\x82%s ", player_names[pnum]);
 
-	switch (msg)
+switch (msg)
 	{
-		case KICK_MSG_GO_AWAY:
-			if (!players[pnum].quittime)
-				HU_AddChatText(va("\x82*%s has been kicked (No reason given)", player_names[pnum]), false);
-			kickreason = KR_KICK;
-			break;
-		case KICK_MSG_PING_HIGH:
-			HU_AddChatText(va("\x82*%s left the game (Broke ping limit)", player_names[pnum]), false);
-			kickreason = KR_PINGLIMIT;
-			break;
-		case KICK_MSG_CON_FAIL:
-			HU_AddChatText(va("\x82*%s left the game (Synch failure)", player_names[pnum]), false);
-			kickreason = KR_SYNCH;
+        case KICK_MSG_GO_AWAY:
+            if (!players[pnum].quittime)
+                HU_AddChatText(va("\x82*%s has been kicked (No reason given)", player_names[pnum]), false);
+            kickreason = KR_KICK;
+            S_StartSound(NULL, sfx_pkick);
+            break;
+        case KICK_MSG_PING_HIGH:
+            HU_AddChatText(va("\x82*%s left the game (Broke ping limit)", player_names[pnum]), false);
+            kickreason = KR_PINGLIMIT;
+            S_StartSound(NULL, sfx_pnjoin);
+            break;
+        case KICK_MSG_CON_FAIL:
+            HU_AddChatText(va("\x82*%s left the game (Synch failure)", player_names[pnum]), false);
+            kickreason = KR_SYNCH;
+            S_StartSound(NULL, sfx_psfail);
 
-			if (M_CheckParm("-consisdump")) // Helps debugging some problems
-			{
-				CONS_Printf(M_GetText("Player kicked is #%d, dumping consistency...\n"), pnum);
+            if (M_CheckParm("-consisdump")) // Helps debugging some problems
+            {
+                CONS_Printf(M_GetText("Player kicked is #%d, dumping consistency...\n"), pnum);
 
-				for (INT32 i = 0; i < MAXPLAYERS; i++)
-				{
-					if (!playeringame[i])
-						continue;
-					CONS_Printf("-------------------------------------\n");
-					CONS_Printf("Player %d: %s\n", i, player_names[i]);
-					CONS_Printf("Skin: %d\n", players[i].skin);
-					CONS_Printf("Color: %d\n", players[i].skincolor);
-					CONS_Printf("Speed: %d\n",players[i].speed>>FRACBITS);
-					if (players[i].mo)
-					{
-						if (!players[i].mo->skin)
-							CONS_Printf("Mobj skin: NULL!\n");
-						else
-							CONS_Printf("Mobj skin: %s\n", ((skin_t *)players[i].mo->skin)->name);
-						CONS_Printf("Position: %d, %d, %d\n", players[i].mo->x, players[i].mo->y, players[i].mo->z);
-						if (!players[i].mo->state)
-							CONS_Printf("State: S_NULL\n");
-						else
-							CONS_Printf("State: %d\n", (statenum_t)(players[i].mo->state-states));
-					}
-					else
-						CONS_Printf("Mobj: NULL\n");
-					CONS_Printf("-------------------------------------\n");
-				}
-			}
-			break;
-		case KICK_MSG_TIMEOUT:
-			HU_AddChatText(va("\x82*%s left the game (Connection timeout)", player_names[pnum]), false);
-			kickreason = KR_TIMEOUT;
-			break;
-		case KICK_MSG_PLAYER_QUIT:
-			if (netgame && !players[pnum].quittime) // not splitscreen/bots or soulless body
-				HU_AddChatText(va("\x82*%s left the game", player_names[pnum]), false);
-			kickreason = KR_LEAVE;
-			break;
-		case KICK_MSG_BANNED:
-			HU_AddChatText(va("\x82*%s has been banned (No reason given)", player_names[pnum]), false);
-			kickreason = KR_BAN;
-			break;
-		case KICK_MSG_CUSTOM_KICK:
-			READSTRINGN(*p, reason, MAX_REASONLENGTH+1);
-			HU_AddChatText(va("\x82*%s has been kicked (%s)", player_names[pnum], reason), false);
-			kickreason = KR_KICK;
-			break;
-		case KICK_MSG_CUSTOM_BAN:
-			READSTRINGN(*p, reason, MAX_REASONLENGTH+1);
-			HU_AddChatText(va("\x82*%s has been banned (%s)", player_names[pnum], reason), false);
-			kickreason = KR_BAN;
-			break;
-		case KICK_MSG_IDLE:
-			HU_AddChatText(va("\x82*%s has left the game (Inactive for too long)", player_names[pnum]), false);
-			kickreason = KR_TIMEOUT;
-			break;
+                for (INT32 i = 0; i < MAXPLAYERS; i++)
+                {
+                    if (!playeringame[i])
+                        continue;
+                    CONS_Printf("-------------------------------------\n");
+                    CONS_Printf("Player %d: %s\n", i, player_names[i]);
+                    CONS_Printf("Skin: %d\n", players[i].skin);
+                    CONS_Printf("Color: %d\n", players[i].skincolor);
+                    CONS_Printf("Speed: %d\n",players[i].speed>>FRACBITS);
+                    if (players[i].mo)
+                    {
+                        if (!players[i].mo->skin)
+                            CONS_Printf("Mobj skin: NULL!\n");
+                        else
+                            CONS_Printf("Mobj skin: %s\n", ((skin_t *)players[i].mo->skin)->name);
+                        CONS_Printf("Position: %d, %d, %d\n", players[i].mo->x, players[i].mo->y, players[i].mo->z);
+                        if (!players[i].mo->state)
+                            CONS_Printf("State: S_NULL\n");
+                        else
+                            CONS_Printf("State: %d\n", (statenum_t)(players[i].mo->state-states));
+                    }
+                    else
+                        CONS_Printf("Mobj: NULL\n");
+                    CONS_Printf("-------------------------------------\n");
+                }
+            }
+            break;
+        case KICK_MSG_TIMEOUT:
+            HU_AddChatText(va("\x82*%s left the game (Connection timeout)", player_names[pnum]), false);
+            kickreason = KR_TIMEOUT;
+            S_StartSound(NULL, sfx_psfail);
+            break;
+        case KICK_MSG_PLAYER_QUIT:
+            if (netgame && !players[pnum].quittime) // not splitscreen/bots or soulless body
+                HU_AddChatText(va("\x82*%s left the game", player_names[pnum]), false);
+            kickreason = KR_LEAVE;
+            S_StartSound(NULL, sfx_pleave);
+            break;
+        case KICK_MSG_BANNED:
+            HU_AddChatText(va("\x82*%s has been banned (No reason given)", player_names[pnum]), false);
+            kickreason = KR_BAN;
+            S_StartSound(NULL, sfx_pban);
+            break;
+        case KICK_MSG_CUSTOM_KICK:
+            READSTRINGN(*p, reason, MAX_REASONLENGTH+1);
+            HU_AddChatText(va("\x82*%s has been kicked (%s)", player_names[pnum], reason), false);
+            kickreason = KR_KICK;
+            S_StartSound(NULL, sfx_pkick);
+            break;
+        case KICK_MSG_CUSTOM_BAN:
+            READSTRINGN(*p, reason, MAX_REASONLENGTH+1);
+            HU_AddChatText(va("\x82*%s has been banned (%s)", player_names[pnum], reason), false);
+            kickreason = KR_BAN;
+            S_StartSound(NULL, sfx_pban);
+            break;
+        case KICK_MSG_IDLE:
+            HU_AddChatText(va("\x82*%s has left the game (Inactive for too long)", player_names[pnum]), false);
+            kickreason = KR_TIMEOUT;
+            S_StartSound(NULL, sfx_pkick);
+            break;
 	}
 
 	// If a verified admin banned someone, the server needs to know about it.
