@@ -2294,8 +2294,8 @@ static void Got_Pause(UINT8 **cp, INT32 playernum)
 	{
 		if (netgame)
 		{
-			if (dedicatedpause)
-				playername = "SERVER";
+			if (dedicatedpause && playernum == serverplayer) 
+				playername = "~SERVER";
 			else
 				playername = player_names[playernum];
 
